@@ -1,12 +1,15 @@
+{-# LANGUAGE OverloadedStrings #-}
 module GHCiManager where
 
-import Data.List (isInfixOf)
+import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
 import System.IO
 import System.Process
 
 import GHCiParser
 
-type GHCiHandle = (Handle, Handle, Handle)
+type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
 
 ghciPath :: FilePath
 ghciPath = "ghci"
@@ -14,62 +17,58 @@ ghciPath = "ghci"
 ghciArgs :: [String]
 ghciArgs = []
 
-stdoutSentinel, stderrSentinel :: String
+stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
 stderrSentinel = "oopsthisisnotavariable"
 
 newGHCi :: IO GHCiHandle
 newGHCi = do
-    (Just hin, Just hout, Just herr, _) <-
+    (Just hin, Just hout, Just herr, pid) <-
       createProcess (proc ghciPath ghciArgs) {
               std_out = CreatePipe, std_in = CreatePipe, std_err = CreatePipe
           }
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering
     hSetBuffering herr NoBuffering
-    hPutStr hin $ ":t " ++ stdoutSentinel ++ "\n"
+    T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
     _ <- getGHCiOut hout
-    return (hin, hout, herr)
+    return (hin, hout, herr, pid)
 
-queryGHCI :: GHCiHandle -> String -> IO String
-queryGHCI (hin, hout, herr) input = do
-    putStrLn $ "query ghci: "  ++ input
-    hPutStr hin $ ensureNewLine input
+queryGHCI :: GHCiHandle -> Text -> IO Text
+queryGHCI (hin, hout, herr, _) input = do
+    T.hPutStrLn hin $ ensureNoNewLine input
     -- This is a hack that lets us discover where the end of the output is.
     -- We will keep reading until we see the sentinel.
     errors <- do
-        hPutStr hin $ stderrSentinel ++ "\n"
+        T.hPutStrLn hin $ stderrSentinel
         getGHCiErr herr
     output <- do
-        hPutStr hin $ ":t " ++ stdoutSentinel ++ "\n"
+        T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
         getGHCiOut hout
-    if trimWhitespace errors == "" 
+    if T.null (T.strip errors)
         then return output
-        else return $ "ERR: " ++ show (parseErrors errors)
+        else return $ "ERR: " `T.append` T.pack (show $ parseErrors $ T.unpack errors)
 
-getGHCiErr :: Handle -> IO String
-getGHCiErr herr' = 
-    go herr' ""
+getGHCiErr :: Handle -> IO Text
+getGHCiErr herr = go T.empty
   where
-    go herr results = do
-      line <- hGetLine herr
-      -- putStrLn $ "Error: " ++ line
-      if stderrSentinel `isInfixOf` line
-        then return(results)
-        else go herr (results ++ "\n" ++ line)
+    go results = do
+      line <- T.hGetLine herr
+      if stderrSentinel `T.isInfixOf` line
+        then return results
+        else go $ results `T.snoc` '\n' `T.append` line
 
-getGHCiOut :: Handle -> IO String
+getGHCiOut :: Handle -> IO Text
 getGHCiOut hout = go []
   where
     go acc = do
-      l <- hGetLine hout
-      -- putStrLn $ "Input: " ++ l
-      if stdoutSentinel `isInfixOf` l
-        then return $ done acc
+      l <- T.hGetLine hout
+      if stdoutSentinel `T.isInfixOf` l
+        then return (done acc)
         else go (l:acc)
     
     done [] = "\n"
-    done xs = unlines $ reverse xs
+    done xs = T.unlines $ reverse xs
 
 -- hGetBlockInitial :: Handle -> IO String
 -- hGetBlockInitial h = do

@@ -1,18 +1,14 @@
 module GHCiParser (
-        ensureNewLine,
-        trimWhitespace,
+        ensureNoNewLine,
         parseErrors
     ) where
 
-import Data.Char (isSpace)
+import Data.Text (Text)
+import qualified Data.Text as T
 
-ensureNewLine :: String -> String
-ensureNewLine xs | last xs /= '\n' = xs ++ "\n"
-                 | otherwise       = xs
-
-trimWhitespace :: String -> String
-trimWhitespace = f . f
-    where f = reverse . dropWhile isSpace
+ensureNoNewLine :: Text -> Text
+ensureNoNewLine xs | T.last xs == '\n' = T.init xs
+                   | otherwise         = xs
 
 -- Take the interactive output and make it a little more JavaScript friendly.
 -- Return a tuple of (position, position, details)
