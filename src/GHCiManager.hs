@@ -31,39 +31,30 @@ newGHCi = do
     hSetBuffering hout NoBuffering
     hSetBuffering herr NoBuffering
     T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
-    _ <- getGHCiOut hout
+    _ <- getGHCiOut hout stdoutSentinel
     return (hin, hout, herr, pid)
 
 queryGHCI :: GHCiHandle -> Text -> IO Text
 queryGHCI (hin, hout, herr, _) input = do
     T.hPutStrLn hin $ ensureNoNewLine input
-    -- This is a hack that lets us discover where the end of the output is.
-    -- We will keep reading until we see the sentinel.
+    -- This is a hack that lets us discover where the end of the output is.  We
+    -- will keep reading until we see the sentinel.
     errors <- do
         T.hPutStrLn hin $ stderrSentinel
-        getGHCiErr herr
+        getGHCiOut herr stderrSentinel
     output <- do
         T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
-        getGHCiOut hout
+        getGHCiOut hout stdoutSentinel
     if T.null (T.strip errors)
         then return output
         else return $ "ERR: " `T.append` T.pack (show $ parseErrors $ T.unpack errors)
 
-getGHCiErr :: Handle -> IO Text
-getGHCiErr herr = go T.empty
-  where
-    go results = do
-      line <- T.hGetLine herr
-      if stderrSentinel `T.isInfixOf` line
-        then return results
-        else go $ results `T.snoc` '\n' `T.append` line
-
-getGHCiOut :: Handle -> IO Text
-getGHCiOut hout = go []
+getGHCiOut :: Handle -> Text -> IO Text
+getGHCiOut hout sentinel = go []
   where
     go acc = do
       l <- T.hGetLine hout
-      if stdoutSentinel `T.isInfixOf` l
+      if sentinel `T.isInfixOf` l
         then return (done acc)
         else go (l:acc)
     
