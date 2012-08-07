@@ -1,0 +1,40 @@
+Name:                GHCiOnline
+Version:             0.1
+--License:             BSD3
+--License-file:        LICENSE
+Author:              David Terei <davidt@scs.stanford.edu>
+--Maintainer:
+Stability:           Experimental
+--Category:
+Build-type:          Simple
+Synopsis:            GHCi Online
+Cabal-version:       >= 1.6
+Description:        
+    GHCi Online
+
+source-repository head
+  type: git
+  location: git://github.com/dterei/GHCiOnline.git
+
+Executable GHCiOnline
+  Main-Is:         Main.hs
+  Hs-Source-Dirs:  src
+  Other-Modules:   SnapVersion,
+                   WarpVersion
+  Build-depends: base >= 4 && < 5,
+                 bytestring >= 0.9 && < 1.0,
+                 case-insensitive < 1.0,
+                 conduit >= 0.5 && < 0.6,
+                 containers >= 0.4 && < 1.0,
+                 http-types >= 0.5 && < 1.0,
+                 process >= 1 && < 2,
+                 random >= 1 && < 2,
+                 transformers >= 0.2 && < 0.4,
+                 wai  >= 1 && < 2,
+                 wai-lite >= 0.1 && < 0.2,
+                 warp >= 1 && < 2,
+                 -- snap
+                 snap-core >= 0.9 && < 1.0,
+                 snap-server >= 0.9 && < 1.0
+  Ghc-options: -Wall
+
