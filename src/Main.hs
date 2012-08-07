@@ -66,6 +66,7 @@ ghciIn mst = do
     uin <- getData
     out <- liftIO $ queryGHCI (csGhci cst) (decodeUtf8 uin)
     writeBS $ encodeUtf8 out
+    modifyResponse $ setContentType "text/plain; charset=UTF-8"
   where
     getData = do
         input <- getPostParam "data"
