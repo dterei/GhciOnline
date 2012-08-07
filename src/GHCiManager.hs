@@ -37,8 +37,8 @@ newGHCi = do
 queryGHCI :: GHCiHandle -> Text -> IO Text
 queryGHCI (hin, hout, herr, _) input = do
     T.hPutStrLn hin $ ensureNoNewLine input
-    -- This is a hack that lets us discover where the end of the output is.  We
-    -- will keep reading until we see the sentinel.
+    -- This is a hack that lets us discover where the end of the output is.
+    -- We will keep reading until we see the sentinel.
     errors <- do
         T.hPutStrLn hin $ stderrSentinel
         getGHCiOut herr stderrSentinel
