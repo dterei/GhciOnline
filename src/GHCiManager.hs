@@ -47,7 +47,7 @@ queryGHCI (hin, hout, herr, _) input = do
         getGHCiOut hout stdoutSentinel
     if T.null (T.strip errors)
         then return output
-        else return $ "ERR: " `T.append` T.pack (show $ parseErrors $ T.unpack errors)
+        else return $ "ERR: " `T.append` parseErrors errors
 
 getGHCiOut :: Handle -> Text -> IO Text
 getGHCiOut hout sentinel = go []

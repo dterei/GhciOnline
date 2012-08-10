@@ -159,8 +159,7 @@ $(function() {
       // do_type_annotations($old_elem.children("#content"));
     } else {
       if (starts_with(content, "ERR: ")) {
-        var tuple = eval(htmlDecode(content.slice(5)));
-
+        var tuple = eval(content.slice(5));
         content = tuple[2];
         $new_elem.children("#content").css({'color' : 'red'});
         $new_elem.children("#prompt").replaceWith($("<img src='static/fail.png'></img>"));
