@@ -1,38 +1,43 @@
 Name:                GHCiOnline
-Version:             0.1
---License:             BSD3
---License-file:        LICENSE
-Author:              David Terei <davidt@scs.stanford.edu>
---Maintainer:
-Stability:           Experimental
---Category:
-Build-type:          Simple
+Version:             0.1.0
 Synopsis:            GHCi Online
-Cabal-version:       >= 1.6
 Description:        
     GHCi Online
+Category:            Web, GHC, Compiler
+Author:              David Terei <davidt@scs.stanford.edu>
+Maintainer:          David Terei <davidt@scs.stanford.edu>
+Copyright:           David Terei
+Homepage:            https://github.com/dterei/GHCiOnline
+Bug-Reports:         https://github.com/dterei/GHCiOnline/issues
+License:             BSD3
+License-file:        LICENSE
+Stability:           Experimental
 
-source-repository head
-  type: git
-  location: git://github.com/dterei/GHCiOnline.git
+Cabal-version:       >= 1.6
+Build-type:          Simple
+Extra-Source-Files:  README.md, TODO.md
+
+Source-Repository head
+    Type: git
+    Location: git://github.com/dterei/GHCiOnline.git
 
 Executable GHCiOnline
-  Hs-Source-Dirs:  src
-  Main-Is:         Main.hs
-  Other-Modules:   GHCiManager,
-                   GHCiParser,
-                   Sessions
-  Build-depends: aeson >= 0.6 && < 1.0,
-                 base >= 4 && < 5,
-                 bytestring >= 0.9 && < 1.0,
-                 case-insensitive < 1.0,
-                 containers >= 0.4 && < 1.0,
-                 process >= 1 && < 2,
-                 random >= 1 && < 2,
-                 transformers >= 0.2 && < 0.4,
-                 snap-core >= 0.9 && < 1.0,
-                 snap-server >= 0.9 && < 1.0,
-                 text >= 0.11 && < 0.12,
-                 unordered-containers > 0.2 && < 0.3
-  Ghc-options: -Wall
+    Hs-Source-Dirs: src
+    Main-Is:        Main.hs
+    Other-Modules:  GHCiManager,
+                    GHCiParser,
+                    Sessions
+    Ghc-options: -Wall
+    Build-depends: aeson >= 0.6 && < 1.0,
+                   base >= 4 && < 5,
+                   bytestring >= 0.9 && < 1.0,
+                   case-insensitive < 1.0,
+                   containers >= 0.4 && < 1.0,
+                   process >= 1 && < 2,
+                   random >= 1 && < 2,
+                   transformers >= 0.2 && < 0.4,
+                   snap-core >= 0.9 && < 1.0,
+                   snap-server >= 0.9 && < 1.0,
+                   text >= 0.11 && < 0.12,
+                   unordered-containers > 0.2 && < 0.3
 
