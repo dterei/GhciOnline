@@ -18,12 +18,13 @@ import Snap.Util.FileServe
 
 import GHCiManager
 import Sessions
+import qualified Timeout as T
 
 type GhciState = Session ClientState
 
 data ClientState = ClientState {
         csGhci :: GHCiHandle,
-        csLast :: Int
+        csTout :: T.Handle
     }
 
 config :: Config Snap ()
@@ -54,17 +55,30 @@ index mst = do
 
 startSession :: GhciState -> UID -> Snap ()
 startSession mst uid = liftIO $ modifyMVar_ mst $ \st ->
-        case I.lookup uid st of
-            Just _  -> return st
-            Nothing -> do
-                h <- liftIO newGHCi
-                return $ I.insert uid (ClientState h 0) st
+    case I.lookup uid st of
+        Just _  -> return st
+        Nothing -> do
+            h <- liftIO newGHCi
+            -- TODO: have actual timeout manager...
+            t <- T.register undefined $ endSession mst uid
+            return $ I.insert uid (ClientState h t) st
+
+endSession :: GhciState -> UID -> IO ()
+endSession mst uid = modifyMVar_ mst $ \st ->
+    -- lookup + delete in one operation
+    let (mclient, st') = I.updateLookupWithKey (\_ _ -> Nothing) uid st
+    in case mclient of
+        Nothing -> return st'
+        Just client -> do
+            killGHCi $ csGhci client
+            T.cancel $ csTout client
+            return st'
 
 ghciIn :: GhciState -> Snap ()
 ghciIn mst = do
     cst <- requireSession mst
     uin <- getData
-    out <- liftIO $ queryGHCI (csGhci cst) (decodeUtf8 uin)
+    out <- liftIO $ queryGHCi (csGhci cst) (decodeUtf8 uin)
     writeBS $ encodeUtf8 out
     modifyResponse $ setContentType "text/plain; charset=UTF-8"
   where

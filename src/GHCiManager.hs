@@ -1,5 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module GHCiManager where
+module GHCiManager (
+        GHCiHandle,
+        newGHCi,
+        killGHCi,
+        queryGHCi
+    ) where
 
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -34,8 +39,11 @@ newGHCi = do
     _ <- getGHCiOut hout stdoutSentinel
     return (hin, hout, herr, pid)
 
-queryGHCI :: GHCiHandle -> Text -> IO Text
-queryGHCI (hin, hout, herr, _) input = do
+killGHCi :: GHCiHandle -> IO ()
+killGHCi _ = return ()
+
+queryGHCi :: GHCiHandle -> Text -> IO Text
+queryGHCi (hin, hout, herr, _) input = do
     T.hPutStrLn hin $ ensureNoNewLine input
     -- This is a hack that lets us discover where the end of the output is.
     -- We will keep reading until we see the sentinel.

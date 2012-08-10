@@ -10,12 +10,20 @@ Copyright:           David Terei
 Homepage:            https://github.com/dterei/GHCiOnline
 Bug-Reports:         https://github.com/dterei/GHCiOnline/issues
 License:             BSD3
-License-file:        LICENSE
+License-File:        LICENSE
 Stability:           Experimental
 
-Cabal-version:       >= 1.6
-Build-type:          Simple
-Extra-Source-Files:  README.md, TODO.md
+Cabal-Version:       >= 1.6
+Build-Type:          Simple
+Extra-Source-Files:
+    LICENSE,
+    README.md,
+    TODO.md,
+    static/fail.png,
+    static/index.html,
+    static/main.js,
+    static/ok.png,
+    static/style.css
 
 Source-Repository head
     Type: git
@@ -26,9 +34,10 @@ Executable GHCiOnline
     Main-Is:        Main.hs
     Other-Modules:  GHCiManager,
                     GHCiParser,
-                    Sessions
-    Ghc-options: -Wall
-    Build-depends: aeson >= 0.6 && < 1.0,
+                    Sessions,
+                    Timeout
+    Ghc-Options: -Wall
+    Build-Depends: aeson >= 0.6 && < 1.0,
                    base >= 4 && < 5,
                    bytestring >= 0.9 && < 1.0,
                    case-insensitive < 1.0,
