@@ -24,6 +24,7 @@ Extra-Source-Files:
     static/main.js,
     static/ok.png,
     static/style.css
+    static/jquery-1.8.0.min.js
 
 Source-Repository head
     Type: git
