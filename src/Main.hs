@@ -20,7 +20,10 @@ import GHCiManager
 import Sessions
 import qualified Timeout as T
 
-type GhciState = Session ClientState
+data GhciState = GhciState {
+        gsClients :: Session ClientState,
+        gsTimeout :: T.Manager
+    }
 
 data ClientState = ClientState {
         csGhci :: GHCiHandle,
@@ -33,12 +36,14 @@ config = setPort 3001 mempty
 main :: IO ()
 main = do
     st <- newMVar I.empty
-    httpServe config (site st)
+    -- 15 seconds...
+    tm <- T.initialize (15 * 1000000)
+    httpServe config (site $ GhciState st tm)
 
 site :: GhciState -> Snap ()
-site st = 
-    ifTop (index st) <|>
-    path "ghci" (method POST (ghciIn st)) <|>
+site gst = 
+    ifTop (index gst) <|>
+    path "ghci" (method POST (ghciIn gst)) <|>
     dir "static" (serveDirectoryWith conf "static")
   where
     -- somewhat of a hack to get UTF-8 info passed in headers...
@@ -46,25 +51,25 @@ site st =
     conf = simpleDirectoryConfig { mimeTypes = utf8mime }
 
 index :: GhciState -> Snap ()
-index mst = do
-    uid <- getSession <|> newSession mst
-    startSession mst uid
+index gst = do
+    uid <- getSession <|> newSession (gsClients gst)
+    startSession gst uid
     modifyResponse $ setContentType "text/html; charset=UTF-8"
     modifyResponse $ setHeader "Content-Language" "en"
     sendFile "static/index.html"
 
 startSession :: GhciState -> UID -> Snap ()
-startSession mst uid = liftIO $ modifyMVar_ mst $ \st ->
+startSession gst uid = liftIO $ modifyMVar_ (gsClients gst) $ \st ->
     case I.lookup uid st of
         Just _  -> return st
         Nothing -> do
             h <- liftIO newGHCi
-            -- TODO: have actual timeout manager...
-            t <- T.register undefined $ endSession mst uid
+            t <- T.register (gsTimeout gst) $ endSession gst uid
+            -- let t = undefined
             return $ I.insert uid (ClientState h t) st
 
 endSession :: GhciState -> UID -> IO ()
-endSession mst uid = modifyMVar_ mst $ \st ->
+endSession gst uid = modifyMVar_ (gsClients gst) $ \st ->
     -- lookup + delete in one operation
     let (mclient, st') = I.updateLookupWithKey (\_ _ -> Nothing) uid st
     in case mclient of
@@ -75,10 +80,13 @@ endSession mst uid = modifyMVar_ mst $ \st ->
             return st'
 
 ghciIn :: GhciState -> Snap ()
-ghciIn mst = do
-    cst <- requireSession mst
+ghciIn gst = do
+    cst <- requireSession (gsClients gst)
+    liftIO $ T.tickle (csTout cst)
     uin <- getData
+    liftIO $ T.pause (csTout cst)
     out <- liftIO $ queryGHCi (csGhci cst) (decodeUtf8 uin)
+    liftIO $ T.resume (csTout cst)
     writeBS $ encodeUtf8 out
     modifyResponse $ setContentType "text/plain; charset=UTF-8"
   where
@@ -87,7 +95,8 @@ ghciIn mst = do
         case input of
             Just d -> return d
             _ -> do
-                writeBS "Error: You must include a 'data' post parameter!"
+                -- treat empty post as a keep-alive message
+                liftIO $ putStrLn "keep-alive..."
                 r <- getResponse
-                finishWith $ setResponseCode 400 r
+                finishWith $ r
 

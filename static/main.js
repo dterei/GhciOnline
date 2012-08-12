@@ -435,6 +435,11 @@ $(function() {
     // populate_autocomplete();
   }
 
+  // Keep-Alive
+  setInterval(function () {
+    $.post('/ghci');
+  }, 10 * 1000);
+
   initialize();
 });
 

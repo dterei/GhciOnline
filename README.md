@@ -15,6 +15,10 @@ An online version of GHCi that uses Safe Haskell for security.
 * http://codemirror.net/
 * http://hackage.haskell.org/package/wai-websockets
 * http://stackoverflow.com/questions/2043165/operational-transformation-library 
+* http://chaoscollective.org/projects/builtinspace.html
+* https://c9.io/
+* http://nowjs.com/
+* http://socket.io/
 
 ## Interesting Packages
 

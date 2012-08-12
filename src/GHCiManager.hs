@@ -40,7 +40,7 @@ newGHCi = do
     return (hin, hout, herr, pid)
 
 killGHCi :: GHCiHandle -> IO ()
-killGHCi _ = return ()
+killGHCi (_, _, _, pid) = terminateProcess pid
 
 queryGHCi :: GHCiHandle -> Text -> IO Text
 queryGHCi (hin, hout, herr, _) input = do
