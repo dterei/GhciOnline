@@ -96,7 +96,6 @@ ghciIn gst = do
             Just d -> return d
             _ -> do
                 -- treat empty post as a keep-alive message
-                liftIO $ putStrLn "keep-alive..."
                 r <- getResponse
                 finishWith $ r
 

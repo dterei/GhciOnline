@@ -49,11 +49,13 @@ queryGHCi (hin, hout, herr, _) input = do
     -- We will keep reading until we see the sentinel.
     errors <- do
         T.hPutStrLn hin $ stderrSentinel
-        getGHCiOut herr stderrSentinel
+        cont <- getGHCiOut herr stderrSentinel
+        return $ T.strip cont
     output <- do
         T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
-        getGHCiOut hout stdoutSentinel
-    if T.null (T.strip errors)
+        cont <- getGHCiOut hout stdoutSentinel
+        return $ T.strip cont
+    if T.null errors
         then return output
         else return $ "ERR: " `T.append` parseErrors errors
 

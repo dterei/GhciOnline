@@ -13,11 +13,13 @@ import qualified Data.Text.Lazy as L
 import qualified Data.Text.Lazy.Builder as L
 
 ensureNoNewLine :: Text -> Text
-ensureNoNewLine xs | T.last xs == '\n' = T.init xs
+ensureNoNewLine xs | T.null xs         = T.singleton '\n'
+                   | T.last xs == '\n' = T.init xs
                    | otherwise         = xs
 
 parseErrors :: Text -> Text
-parseErrors str = L.toStrict . L.toLazyText . fromValue . toJSON $ [l, c, msg]
+parseErrors str =
+    L.toStrict . L.toLazyText . fromValue . toJSON $ [l, c, T.strip msg]
   where
     -- <interactive>:1:1:msg.....
     (l, (c, msg)) = second split $ split $ snd (split str)
