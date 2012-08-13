@@ -1,4 +1,8 @@
 @charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Inconsolata);
+/* @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono); */
+/* @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono); */
+/* @import url(http://fonts.googleapis.com/css?family=PT+Mono); */
 
 body {
   font-family: "Monospace", sans-serif;
@@ -98,5 +102,14 @@ ul#autocomplete {
 
 #prompt {
   margin-right: 5px;
+}
+
+#content {
+  display: inline;
+  font-size: 1em;
+  font-family: 'Inconsolata', monospace;
+  /* font-family: 'PT Mono', monospace; */
+  /* font-family: 'Droid Sans Mono', monospace; */
+  /* font-family: 'Ubuntu Mono', monospace; */
 }
 
