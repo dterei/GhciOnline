@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards #-}
 module Sessions (
         UID, newUID, getUID,
-        Session, newSession, getSession, requireSession
+        Session, newSession, expireSession, getSession, requireSession
     ) where
 
 import Control.Applicative
@@ -43,6 +43,10 @@ newSession mst = do
         sessionCookie { cookieValue = (S8.pack $ show uid) }
     return uid
 
+expireSession :: Snap ()
+expireSession =
+    expireCookie (cookieName sessionCookie) (cookieDomain sessionCookie)
+
 getSession :: Snap UID
 getSession = do
     uid' <- getUID
@@ -58,7 +62,7 @@ requireSession mst = do
         Just c  -> return c
         Nothing -> do
             -- invalid session cookie so expire it
-            expireCookie (cookieName sessionCookie) (cookieDomain sessionCookie)
+            expireSession
             noSessionError
   where
     noSessionError = do
