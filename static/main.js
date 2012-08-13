@@ -380,10 +380,10 @@ $(function() {
   /* Handle key input */
   $(document).bind('keypress', function(e) {
     if (!(e.which === BACKSPACE || e.which === ENTER || e.which === TAB || e.metaKey || e.ctrlKey)) {
-		key = String.fromCharCode(e.which);
-		add_to_console(key);
-		return false;
-	 }
+      key = String.fromCharCode(e.which);
+      add_to_console(key);
+      return false;
+    }
   });
 
   var show_calltips = function() {
