@@ -31,7 +31,7 @@ data ClientState = ClientState {
     }
 
 config :: Config Snap ()
-config = setPort 3001 mempty
+config = setPort 3222 mempty
 
 main :: IO ()
 main = do

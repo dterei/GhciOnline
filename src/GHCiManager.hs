@@ -17,10 +17,10 @@ import GHCiParser
 type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
 
 ghciPath :: FilePath
-ghciPath = "ghci"
+ghciPath = "/home/hs15/davidt/ghci-safe/dist/build/ghci-safe/ghci-safe"
 
 ghciArgs :: [String]
-ghciArgs = []
+ghciArgs = ["-XSafe", "-fpackage-trust"]
 
 stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
@@ -37,6 +37,8 @@ newGHCi = do
     hSetBuffering herr NoBuffering
     T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
     _ <- getGHCiOut hout stdoutSentinel
+    T.hPutStrLn hin $ stderrSentinel
+    _ <- getGHCiOut herr stderrSentinel
     return (hin, hout, herr, pid)
 
 killGHCi :: GHCiHandle -> IO ()

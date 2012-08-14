@@ -94,7 +94,7 @@ $(function() {
   function stripLibs(str) {
     if (str.indexOf("ERR") != -1) { return str; }
     if (str.indexOf("DOC") != -1) { return str; }
-    return str.slice(str.indexOf("&gt;") + 4);
+    return str;
   }
 
   function startsWith(bigger, smaller) {
