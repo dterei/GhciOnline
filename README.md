@@ -12,6 +12,8 @@ An online version of GHCi that uses Safe Haskell for security.
 ## Interesting Technology
 
 * https://github.com/chrisdone/jquery-console
+* http://terminal.jcubic.pl/
+* http://www.masswerk.at/termlib/
 * http://codemirror.net/
 * http://hackage.haskell.org/package/wai-websockets
 * http://stackoverflow.com/questions/2043165/operational-transformation-library 
