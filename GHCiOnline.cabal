@@ -39,11 +39,11 @@ Executable GHCiOnline
                     Timeout
     Ghc-Options: -Wall
     Build-Depends: aeson >= 0.6,
-                   base >= 4,
                    bytestring >= 0.9,
                    case-insensitive,
                    containers >= 0.4,
-                   process >= 1<
+                   base >= 4,
+                   process >= 1,
                    random >= 1,
                    transformers >= 0.2,
                    snap-core >= 0.9,
