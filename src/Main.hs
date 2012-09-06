@@ -42,7 +42,7 @@ main = do
 
 site :: GhciState -> Snap ()
 site gst = 
-    ifTop (index gst) <|>
+    ifTop (index gst "static/index2.html") <|>
     path "ghci" (method POST (ghciIn gst)) <|>
     dir "static" (serveDirectoryWith conf "static")
   where
@@ -50,13 +50,13 @@ site gst =
     utf8mime = H.map (\v -> v `S8.append` "; charset=UTF-8") defaultMimeTypes
     conf = simpleDirectoryConfig { mimeTypes = utf8mime }
 
-index :: GhciState -> Snap ()
-index gst = do
+index :: GhciState -> String -> Snap ()
+index gst file = do
     uid <- getSession <|> newSession (gsClients gst)
     startSession gst uid
     modifyResponse $ setContentType "text/html; charset=UTF-8"
     modifyResponse $ setHeader "Content-Language" "en"
-    sendFile "static/index.html"
+    sendFile file
 
 startSession :: GhciState -> UID -> Snap ()
 startSession gst uid = liftIO $ modifyMVar_ (gsClients gst) $ \st ->

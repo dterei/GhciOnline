@@ -72,7 +72,7 @@ $(function() {
   function addOutputLine(content) {
     sendToServer(content, function(data){
       addLine(content, true);
-      addLine(stripLibs(data), false);
+      addLine(data, false);
       window.scrollTo(0, document.body.scrollHeight);
       setTimeout(function(){
         window.scrollTo(0, document.body.scrollHeight);
@@ -89,12 +89,6 @@ $(function() {
       data: {'data' : content},
       success: callback
     });
-  }
-
-  function stripLibs(str) {
-    if (str.indexOf("ERR") != -1) { return str; }
-    if (str.indexOf("DOC") != -1) { return str; }
-    return str;
   }
 
   function startsWith(bigger, smaller) {

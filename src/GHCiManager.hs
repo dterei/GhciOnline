@@ -17,7 +17,7 @@ import GHCiParser
 type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
 
 ghciPath :: FilePath
-ghciPath = "/home/hs15/davidt/ghci-safe/dist/build/ghci-safe/ghci-safe"
+ghciPath = "ghci"
 
 ghciArgs :: [String]
 ghciArgs = ["-XSafe", "-fpackage-trust"]

@@ -8,8 +8,6 @@ body {
   font-family: "Monospace", sans-serif;
   background: #000;
   color: #fff;
-
-  text-shadow: 0 2px 2px rgba(250, 250, 250, .25);
 }
 
 /* There could be many of these. */
