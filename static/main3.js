@@ -20,24 +20,32 @@ $(function() {
     return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
   }
 
-  function decodeResponse(content) {
+  function decodeResponse(odata, cn) {
+    content = $.parseJSON(odata);
     var out;
 
-    if (startsWith(content, "ERR: ")) {
-      var tuple = eval(content.slice(5));
+    if (content['type'] == "error") {
       out = [{
-        msg: htmlDecode(tuple[2]),
+        msg: htmlDecode(content['msg'][2]),
         className: "output-error"
       }];
-    } else if (startsWith(content, "DOC")){
+    } else if (content['type'] == "doc") {
       out = [{
-        msg: htmlDecode(content.slice(3)),
+        msg: htmlDecode(content['msg']),
         className: "output-doc"
       }];
-    } else {
+    } else if (content['type'] == "value") {
       out = $('<code class="prettyprint lang-hs"></code>');
-      out.text(content);
+      out.text(content['msg']);
       out.html(out.html().replace(/\n/g,'<br/>'));
+      if (content['prompt'] && content['prompt'].length > 0) {
+        cn.promptLabel = content['prompt'] + '> ';
+      }
+    } else {
+      out = [{
+        msg: htmlDecode(odata),
+        className: "output-doc"
+      }];
     }
 
     return out;
@@ -56,7 +64,7 @@ $(function() {
   /* JQuery Console... */
   /* ************************************ */
 
-  $("#console").console({
+  var cn = $("#console").console({
     welcomeMessage:'Welcome to GHC.IO!',
     promptLabel: '>  ',
     autofocus: true,
@@ -70,7 +78,7 @@ $(function() {
 
     commandHandle: function(line, report) {
       sendToServer(line, function(data){
-        report(decodeResponse(data));
+        report(decodeResponse(data, cn));
         prettyPrint(); // prettyPrintOne may be better here...
         window.scrollTo(0, document.body.scrollHeight);
       });

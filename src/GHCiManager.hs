@@ -58,8 +58,16 @@ queryGHCi (hin, hout, herr, _) input = do
         cont <- getGHCiOut hout stdoutSentinel
         return $ T.strip cont
     if T.null errors
-        then return output
-        else return $ "ERR: " `T.append` parseErrors errors
+        then do
+            let (p, l) = splitPrompt output
+            return $ prepJSON "value" p (jsonText l)
+        else return $ prepJSON "error" "" (parseErrors errors)
+  where
+    prepJSON t p l = "{" `T.append`
+            "\"prompt\":\"" `T.append` p `T.append`
+            "\", \"type\":\"" `T.append` t `T.append`
+            "\", \"msg\":" `T.append` l `T.append`
+        "}" 
 
 getGHCiOut :: Handle -> Text -> IO Text
 getGHCiOut hout sentinel = go []

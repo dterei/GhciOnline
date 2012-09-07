@@ -56,11 +56,14 @@ body {
 #console div.jquery-console-inner {
   width: 100%;
   overflow: auto;
+  font-size: 1em;
+  font-family: 'Inconsolata', monospace;
 }
 
 .jquery-console-prompt-box {
   color: #FFF;
-  font-family: monospace;
+  font-size: 1em;
+  font-family: 'Inconsolata', monospace;
 }
 
 .jquery-console-focus span.jquery-console-cursor {
@@ -75,12 +78,14 @@ span.jquery-console-prompt-label {
 
 .output-error {
   color: #EF0505;
-  font-family: sans-serif;
+  font-size: 1em;
+  font-family: 'Inconsolata', monospace;
   font-weight: bold;
 }
 
 .output-value {
   color: #1AD027;
-  font-family:monospace;
+  font-size: 1em;
+  font-family: 'Inconsolata', monospace;
 }
 

@@ -207,7 +207,8 @@
 	    enableInput();
             promptBox = $('<div class="jquery-console-prompt-box"></div>');
             var label = $('<span class="jquery-console-prompt-label"></span>');
-            var labelText = extern.continuedPrompt? continuedPromptLabel : promptLabel;
+            var pl = extern.promptLabel? extern.promptLabel : promptLabel;
+            var labelText = extern.continuedPrompt? continuedPromptLabel : pl;
             promptBox.append(label.text(labelText).show());
             label.html(label.html().replace(' ','&nbsp;'));
             prompt = $('<span class="jquery-console-prompt"></span>');

@@ -1,7 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module GHCiParser (
         ensureNoNewLine,
-        parseErrors
+        parseErrors,
+        splitPrompt,
+        jsonText
     ) where
 
 import Control.Arrow
@@ -25,3 +27,9 @@ parseErrors str =
     (l, (c, msg)) = second split $ split $ snd (split str)
     split = second (T.drop 1) . T.break ((==) ':')
 
+splitPrompt :: Text -> (Text, Text)
+splitPrompt = second (T.strip . (T.drop 1)) . T.break ((==) '>')
+
+jsonText :: Text -> Text
+jsonText = L.toStrict . L.toLazyText . fromValue . toJSON
+    -- T.replace "\"" "\\\""
