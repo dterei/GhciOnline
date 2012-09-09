@@ -14,7 +14,7 @@ pre .atv, code .atv { color: #65B042; } /* html/xml attribute value - green */
 pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
 
 pre.prettyprint, code.prettyprint {
-	background-color: #000;
+	background-color: #222;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	-o-border-radius: 8px;
@@ -44,7 +44,7 @@ li.L1,li.L3,li.L5,li.L7,li.L9 { }
   pre .typ, code .typ { color: #404; font-weight: bold; }
   pre .lit, code .lit { color: #044; }
   pre .pun, code .pun { color: #440; }
-  pre .pln, code .pln { color: #000; }
+  pre .pln, code .pln { color: #222; }
   pre .tag, code .tag { color: #006; font-weight: bold; }
   pre .atn, code .atn { color: #404; }
   pre .atv, code .atv { color: #060; }

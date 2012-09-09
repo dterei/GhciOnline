@@ -16,20 +16,6 @@ body {
   word-wrap: break-word;
 }
 
-/* #sidebar { */
-/*   background: #555; */
-/*   width: 20%; */
-/*   float: right; */
-/* } */
-/*  */
-/* #sidelist { */
-/*   margin-left: 0px; */
-/*   padding-left: 5px; */
-/*   text-shadow: 0 1px 2px rgba(40, 40, 40, .25); */
-/*   font-size: 70%; */
-/*   list-style-type: none; */
-/* } */
-
 #prompt {
   margin-right: 5px;
 }
@@ -44,26 +30,22 @@ body {
   border-left: 1px solid white;
 }
 
-#content {
-  display: inline;
-  font-size: 1em;
-  font-family: 'Inconsolata', monospace;
+#console div.jquery-console-inner {
+  width: 100%;
+  overflow: auto;
+}
+
+code, #console div.jquery-console-inner {
+  font-size: 16px;
+  font-family: 'Inconsolata', monospace !important;
   /* font-family: 'PT Mono', monospace; */
   /* font-family: 'Droid Sans Mono', monospace; */
   /* font-family: 'Ubuntu Mono', monospace; */
 }
 
-#console div.jquery-console-inner {
-  width: 100%;
-  overflow: auto;
-  font-size: 1em;
-  font-family: 'Inconsolata', monospace;
-}
-
 .jquery-console-prompt-box {
   color: #FFF;
   font-size: 1em;
-  font-family: 'Inconsolata', monospace;
 }
 
 .jquery-console-focus span.jquery-console-cursor {
@@ -79,13 +61,11 @@ span.jquery-console-prompt-label {
 .output-error {
   color: #EF0505;
   font-size: 1em;
-  font-family: 'Inconsolata', monospace;
   font-weight: bold;
 }
 
 .output-value {
   color: #1AD027;
   font-size: 1em;
-  font-family: 'Inconsolata', monospace;
 }
 
