@@ -39,7 +39,7 @@ $(function() {
       out.text(content['msg']);
       out.html(out.html().replace(/\n/g,'<br/>'));
       if (content['prompt'] && content['prompt'].length > 0) {
-        cn.promptLabel = content['prompt'] + '> ';
+        cn.promptLabel = content['prompt'] + ' ';
       }
     } else {
       out = [{
@@ -66,7 +66,7 @@ $(function() {
 
   var cn = $("#console").console({
     welcomeMessage:'Welcome to GHC.IO!',
-    promptLabel: '>  ',
+    promptLabel: 'Prelude> ',
     autofocus: true,
     animateScroll: true,
     promptHistory: true,

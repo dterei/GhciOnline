@@ -6,6 +6,7 @@ module GHCiManager (
         queryGHCi
     ) where
 
+import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -39,6 +40,7 @@ newGHCi = do
     _ <- getGHCiOut hout stdoutSentinel
     T.hPutStrLn hin $ stderrSentinel
     _ <- getGHCiOut herr stderrSentinel
+    clearHandle hout
     return (hin, hout, herr, pid)
 
 killGHCi :: GHCiHandle -> IO ()
@@ -46,21 +48,21 @@ killGHCi (_, _, _, pid) = terminateProcess pid
 
 queryGHCi :: GHCiHandle -> Text -> IO Text
 queryGHCi (hin, hout, herr, _) input = do
+    clearHandle hout
     T.hPutStrLn hin $ ensureNoNewLine input
     -- This is a hack that lets us discover where the end of the output is.
     -- We will keep reading until we see the sentinel.
+    (prompt, output) <- do
+        T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
+        o <- getGHCiOut hout stdoutSentinel
+        p <- hGetAvailable hout
+        return $ (T.strip p, T.strip o)
     errors <- do
         T.hPutStrLn hin $ stderrSentinel
-        cont <- getGHCiOut herr stderrSentinel
-        return $ T.strip cont
-    output <- do
-        T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
-        cont <- getGHCiOut hout stdoutSentinel
-        return $ T.strip cont
+        o <- getGHCiOut herr stderrSentinel
+        return $ T.strip o
     if T.null errors
-        then do
-            let (p, l) = splitPrompt output
-            return $ prepJSON "value" p (jsonText l)
+        then return $ prepJSON "value" prompt (jsonText output)
         else return $ prepJSON "error" "" (parseErrors errors)
   where
     prepJSON t p l = "{" `T.append`
@@ -70,16 +72,29 @@ queryGHCi (hin, hout, herr, _) input = do
         "}" 
 
 getGHCiOut :: Handle -> Text -> IO Text
-getGHCiOut hout sentinel = go []
+getGHCiOut h sentinel = go []
   where
     go acc = do
-      l <- T.hGetLine hout
+      l <- T.hGetLine h
       if sentinel `T.isInfixOf` l
         then return (done acc)
         else go (l:acc)
     
     done [] = "\n"
     done xs = T.unlines $ reverse xs
+
+clearHandle :: Handle -> IO ()
+clearHandle = void . hGetAvailable
+
+hGetAvailable :: Handle -> IO Text
+hGetAvailable h = go ""
+  where
+    go acc = do
+        -- this delay is arbitrary, but we need something
+        r <- hWaitForInput h 5
+        case r of
+            True  -> hGetChar h >>= \c -> go (acc `T.snoc` c)
+            False -> return acc
 
 -- hGetBlockInitial :: Handle -> IO String
 -- hGetBlockInitial h = do
@@ -89,13 +104,4 @@ getGHCiOut hout sentinel = go []
 --     if null ls
 --         then return l
 --         else return $ l ++ "\n" ++ ls
-
--- hGetAvailable :: Handle -> IO String
--- hGetAvailable h = go ""
---   where
---     go acc = do
---         r <- hReady h
---         case r of
---             True  -> hGetChar h >>= \c -> go (c:acc)
---             False -> return $ reverse acc
 
