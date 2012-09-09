@@ -46,7 +46,7 @@ site gst = do
     routes req
   where
     routes req =
-        if (rqServerName req == "www.ghc.io") then (redirect' "ghc.io" 301) else pass <|>
+        if (rqServerName req == "www.ghc.io") then (redirect' "http://ghc.io" 301) else pass <|>
         ifTop (index gst "static/index2.html") <|>
         path "ghci" (method POST (ghciIn gst)) <|>
         dir "static" (serveDirectoryWith conf "static")
