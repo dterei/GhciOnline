@@ -80,7 +80,9 @@
 	    // C-f
 	    70: moveForward,
 	    // C-k
-	    75: deleteUntilEnd
+	    75: deleteUntilEnd,
+      // C-j
+      74: commandTrigger
 	};
 	var altCodes = {
 	    // M-f
