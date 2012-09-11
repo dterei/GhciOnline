@@ -23,7 +23,10 @@ parseErrors str =
     L.toStrict . L.toLazyText . fromValue . toJSON $ [l, c, T.strip msg]
   where
     -- <interactive>:1:1:msg.....
-    (l, (c, msg)) = second split $ split $ snd (split str)
+    (l, c, msg) = if T.null m
+                        then ("", "", l' `T.append` c')
+                        else (l', c', m)
+    (l', (c', m)) = second split $ split $ snd (split str)
     split = second (T.drop 1) . T.break ((==) ':')
 
 jsonText :: Text -> Text

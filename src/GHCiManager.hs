@@ -18,10 +18,10 @@ import GHCiParser
 type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
 
 ghciPath :: FilePath
-ghciPath = "ghci"
+ghciPath = "/home/hs15/davidt/ghci-safe/dist/build/ghci-safe/ghci-safe"
 
 ghciArgs :: [String]
-ghciArgs = ["-XSafe", "-fpackage-trust"]
+ghciArgs = ["-XSafe", "-fpackage-trust", "-distrust-all-packages", "-trust base"]
 
 stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
