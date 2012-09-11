@@ -36,6 +36,7 @@ $(function() {
       }];
     } else if (content['type'] == "value") {
       out = $('<code class="prettyprint lang-hs"></code>');
+      // out = $('<code class="sunlight-highlight-haskell"></code>');
       out.text(content['msg']);
       out.html(out.html().replace(/\n/g,'<br/>'));
       if (content['prompt'] && content['prompt'].length > 0) {
@@ -80,6 +81,7 @@ $(function() {
       sendToServer(line, function(data){
         report(decodeResponse(data, cn));
         prettyPrint(); // prettyPrintOne may be better here...
+        // Sunlight.highlightAll();
         window.scrollTo(0, document.body.scrollHeight);
       });
     },
