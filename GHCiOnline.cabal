@@ -49,5 +49,6 @@ Executable GHCiOnline
                    snap-core >= 0.9,
                    snap-server >= 0.9,
                    text >= 0.11,
-                   unordered-containers > 0.2
+                   unordered-containers > 0.2,
+                   cjail >= 0.1
 

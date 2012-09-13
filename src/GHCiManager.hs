@@ -11,11 +11,14 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import System.IO
-import System.Process
+import CJail.System.Process
 
 import GHCiParser
 
-type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
+cjailConf :: CJailConf
+cjailConf = CJailConf Nothing Nothing "/tmp/jail"
+
+type GHCiHandle = ProcessHandle
 
 ghciPath :: FilePath
 ghciPath = "/home/hs15/davidt/ghci-safe/dist/build/ghci-safe/ghci-safe"
@@ -29,10 +32,8 @@ stderrSentinel = "oopsthisisnotavariable"
 
 newGHCi :: IO GHCiHandle
 newGHCi = do
-    (Just hin, Just hout, Just herr, pid) <-
-      createProcess (proc ghciPath ghciArgs) {
-              std_out = CreatePipe, std_in = CreatePipe, std_err = CreatePipe
-          }
+    phandle@(ProcessHandle hin hout herr _) <-
+          createProcess cjailConf (proc ghciPath ghciArgs)
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering
     hSetBuffering herr NoBuffering
@@ -41,13 +42,13 @@ newGHCi = do
     T.hPutStrLn hin $ stderrSentinel
     _ <- getGHCiOut herr stderrSentinel
     clearHandle hout
-    return (hin, hout, herr, pid)
+    return phandle
 
 killGHCi :: GHCiHandle -> IO ()
-killGHCi (_, _, _, pid) = terminateProcess pid
+killGHCi = terminateProcess
 
 queryGHCi :: GHCiHandle -> Text -> IO Text
-queryGHCi (hin, hout, herr, _) input = do
+queryGHCi (ProcessHandle hin  hout  herr  _) input = do
     clearHandle hout
     T.hPutStrLn hin $ ensureNoNewLine input
     -- This is a hack that lets us discover where the end of the output is.
