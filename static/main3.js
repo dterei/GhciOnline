@@ -1,5 +1,7 @@
 $(function() {
 
+  var highlighter = new Sunlight.Highlighter();
+
   function sendToServer(content, callback) {
     $.ajax({
       type: 'POST',
@@ -35,10 +37,23 @@ $(function() {
         className: "output-doc"
       }];
     } else if (content['type'] == "value") {
-      out = $('<code class="prettyprint lang-hs"></code>');
-      // out = $('<code class="sunlight-highlight-haskell"></code>');
-      out.text(content['msg']);
-      out.html(out.html().replace(/\n/g,'<br/>'));
+      var context;
+      try {
+        context = highlighter.highlight(content['msg'], "haskell");
+      } catch (e) {
+        contet = undefined;
+      }
+      if (context == undefined || context.getNodes() == undefined) {
+        out = $("<code></code>");
+        out.text(content['msg']);
+        out.html(out.html().replace(/\n/g,'<br/>'));
+      } else {
+        out = document.createElement("div");
+        var nodes = context.getNodes();
+        for (var i = 0; i < nodes.length; i++) {
+          out.appendChild(nodes[i]);
+        }
+      }
       if (content['prompt'] && content['prompt'].length > 0) {
         cn.promptLabel = content['prompt'] + ' ';
       }
@@ -80,7 +95,7 @@ $(function() {
     commandHandle: function(line, report) {
       sendToServer(line, function(data){
         report(decodeResponse(data, cn));
-        prettyPrint(); // prettyPrintOne may be better here...
+        // prettyPrint(); // prettyPrintOne may be better here...
         // Sunlight.highlightAll();
         window.scrollTo(0, document.body.scrollHeight);
       });
