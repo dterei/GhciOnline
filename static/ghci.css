@@ -12,6 +12,7 @@ body {
 #console {
   width: 100%;
   word-wrap: break-word;
+  padding-bottom: 30px;
 }
 
 #prompt {
@@ -39,9 +40,15 @@ pre, code {
 }
 
 .jquery-console-prompt-box {
+  margin-bottom: 10px;
 }
 
-.jquery-console-focus span.jquery-console-cursor {
+.jquery-console-focus span.blink.jquery-console-cursor:before {
+  font-weight: bold;
+  content: '_';
+}
+
+.jquery-console-nofocus span.jquery-console-cursor:before {
   font-weight: bold;
 }
 

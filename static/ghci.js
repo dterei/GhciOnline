@@ -94,6 +94,12 @@ $(function() {
     $.post('/ghci');
   }, 10 * 1000);
 
+  // Blink the cursor...
+  setInterval(function(){
+    $("#console").css("min-height", $(window).height() - 140);
+    $(".jquery-console-cursor").toggleClass("blink");
+  }, 750);
+
   /* ************************************ */
   /* JQuery Console... */
   /* ************************************ */
@@ -102,7 +108,7 @@ $(function() {
     welcomeMessage:'Welcome to GHC.IO!',
     promptLabel: 'Prelude> ',
     autofocus: true,
-    animateScroll: true,
+    animateScroll: false,
     promptHistory: true,
 
     commandValidate:function(line) {
@@ -113,12 +119,12 @@ $(function() {
     commandHandle: function(line, report) {
       sendToServer(line, function(data){
         report(decodeResponse(data, cn));
-        window.scrollTo(0, document.body.scrollHeight);
+        $(".jquery-console-cursor").scrollintoview();
       });
     },
 
     charInsertTrigger: function(keycode,line) {
-      window.scrollTo(0, document.body.scrollHeight);
+      $(".jquery-console-cursor").scrollintoview();
       return true;
     }
   });

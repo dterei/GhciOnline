@@ -221,12 +221,14 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Handle setting focus
-        container.click(function(){
-            inner.addClass('jquery-console-focus');
-            inner.removeClass('jquery-console-nofocus');
+        container.click(function() {
             typer.focus();
             scrollToBottom();
             return false;
+        });
+        container.focusin(function() {
+            inner.addClass('jquery-console-focus');
+            inner.removeClass('jquery-console-nofocus');
         });
 
         ////////////////////////////////////////////////////////////////////////
