@@ -47,7 +47,7 @@ site gst = do
   where
     routes req =
         if (rqServerName req == "www.ghc.io") then (redirect' "http://ghc.io" 301) else pass <|>
-        ifTop (index gst "static/index2.html") <|>
+        ifTop (index gst "static/index.html") <|>
         path "ghci" (method POST (ghciIn gst)) <|>
         dir "static" (serveDirectoryWith conf "static")
     -- somewhat of a hack to get UTF-8 info passed in headers...

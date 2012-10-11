@@ -18,10 +18,10 @@ import GHCiParser
 type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
 
 ghciPath :: FilePath
-ghciPath = "/home/hs15/davidt/ghci-safe/dist/build/ghci-safe/ghci-safe"
+ghciPath = "ghci"
 
 ghciArgs :: [String]
-ghciArgs = ["-XSafe", "-fpackage-trust", "-distrust-all-packages", "-trust base"]
+ghciArgs = []
 
 stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
@@ -33,6 +33,7 @@ newGHCi = do
       createProcess (proc ghciPath ghciArgs) {
               std_out = CreatePipe, std_in = CreatePipe, std_err = CreatePipe
           }
+    -- TODO: check this actually worked...
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering
     hSetBuffering herr NoBuffering
