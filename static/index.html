@@ -1,26 +1,65 @@
 <!DOCTYPE html>
 <html lang='en'>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHCi Online (Powered by Safe Haskell)</title>
 
     <link href="static/ghci.css" rel="stylesheet" type="text/css"/>
 
-    <link href="static/sunlight/themes/sunlight.dark.css" rel="stylesheet" type="text/css"/>
+    <!-- sunlight -->
+    <link href="static/sunlight/themes/sunlight.default.css" rel="stylesheet" type="text/css"/>
     <script src="static/sunlight/sunlight-min.js"></script>
     <script src="static/sunlight/sunlight.haskell-min.js"></script>
 
+    <!-- prettify -->
     <link href="static/prettify/prettify.css" rel="stylesheet" type="text/css"/>
     <link href="static/prettify/sunburst.css" rel="stylesheet" type="text/css"/>
     <script src="static/prettify/prettify.js"></script>
     <script src="static/prettify/lang-hs.js"></script>
 
+    <!-- bootstrap -->
+    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="static/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+    <script src="static/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!-- [if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- jquery -->
     <script src="static/jquery-1.8.1.js"></script>
     <script src="static/jquery.console.js"></script>
+
     <script src="static/ghci.js"></script>
   </head>
+
   <body>
-    <div id="console"></div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">GHC.IO</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="#about">About</a></li>
+              <li><a href="#about">Help</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div id="console"></div>
+    </div>
   </body>
+
 </html>
 

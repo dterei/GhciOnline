@@ -1,6 +1,8 @@
 $(function() {
 
-  var highlighter = new Sunlight.Highlighter();
+  /* ************************************ */
+  /* Server... */
+  /* ************************************ */
 
   function sendToServer(content, callback) {
     $.ajax({
@@ -22,6 +24,34 @@ $(function() {
     return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
   }
 
+  var highlighter = new Sunlight.Highlighter();
+
+  function highlight(input) {
+    var out;
+
+    try {
+      context = highlighter.highlight(content['msg'], "haskell");
+    } catch (e) {
+      context = undefined;
+    }
+
+    if (context == undefined || context.getNodes() == undefined) {
+      out = $("<pre></pre>");
+      out.text(content['msg']);
+      out.html(out.html().replace(/\n/g,'<br/>'));
+    } else {
+      out = document.createElement("pre");
+      var nodes = context.getNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        var n = $(nodes[i]);
+        n.html(n.html().replace(/\n/g, '<br/>'));
+        out.appendChild(nodes[i]);
+      }
+    }
+
+    return out;
+  }
+
   function decodeResponse(odata, cn) {
     content = $.parseJSON(odata);
     var out;
@@ -38,24 +68,10 @@ $(function() {
       }];
     } else if (content['type'] == "value") {
       var context;
-      try {
-        context = highlighter.highlight(content['msg'], "haskell");
-      } catch (e) {
-        contet = undefined;
+      if (content['msg'] == undefined || content['msg'].length <= 0) {
+        return undefined;
       }
-      if (context == undefined || context.getNodes() == undefined) {
-        out = $("<code></code>");
-        out.text(content['msg']);
-        out.html(out.html().replace(/\n/g,'<br/>'));
-      } else {
-        out = document.createElement("div");
-        var nodes = context.getNodes();
-        for (var i = 0; i < nodes.length; i++) {
-          var n = $(nodes[i]);
-          n.html(n.html().replace(/\n/g, '<br/>'));
-          out.appendChild(nodes[i]);
-        }
-      }
+      out = highlight(content['msg']);
       if (content['prompt'] && content['prompt'].length > 0) {
         cn.promptLabel = content['prompt'] + ' ';
       }
@@ -97,8 +113,6 @@ $(function() {
     commandHandle: function(line, report) {
       sendToServer(line, function(data){
         report(decodeResponse(data, cn));
-        // prettyPrint(); // prettyPrintOne may be better here...
-        // Sunlight.highlightAll();
         window.scrollTo(0, document.body.scrollHeight);
       });
     },

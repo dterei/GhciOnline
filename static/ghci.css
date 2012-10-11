@@ -1,18 +1,16 @@
 @charset "UTF-8";
-@import url(http://fonts.googleapis.com/css?family=Inconsolata);
-/* @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono); */
+/* @import url(http://fonts.googleapis.com/css?family=Inconsolata); */
+@import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono);
 /* @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono); */
 /* @import url(http://fonts.googleapis.com/css?family=PT+Mono); */
 
 body {
-  font-family: "Monospace", sans-serif;
-  background: #222;
-  color: #fff;
+  padding-top: 60px;
+  padding-bottom: 40px;
 }
 
 #console {
   width: 100%;
-  float: left;
   word-wrap: break-word;
 }
 
@@ -21,13 +19,6 @@ body {
 }
 
 .input {
-  background: #111;
-}
-
-.output {
-  padding-left: 20px;
-  border-left: 20px;
-  border-left: 1px solid white;
 }
 
 #console div.jquery-console-inner {
@@ -35,27 +26,28 @@ body {
   overflow: auto;
 }
 
-code, #console div.jquery-console-inner {
-  font-size: 16px;
-  font-family: 'Inconsolata', monospace !important;
+pre, code, #console div.jquery-console-inner {
+  /* font-family: 'Inconsolata', monospace !important; */
   /* font-family: 'PT Mono', monospace; */
   /* font-family: 'Droid Sans Mono', monospace; */
-  /* font-family: 'Ubuntu Mono', monospace; */
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 1.3em;
+}
+
+pre, code {
+  font-size: 0.85em !important;
 }
 
 .jquery-console-prompt-box {
-  color: #FFF;
-  font-size: 1em;
 }
 
 .jquery-console-focus span.jquery-console-cursor {
-  background: #FEFEFE;
-  color: #333;
   font-weight: bold;
 }
 
 span.jquery-console-prompt-label {
-  font-weight: bold
+  font-weight: bold;
+  font-family: sans-serif;
 }
 
 .output-error {
@@ -64,7 +56,7 @@ span.jquery-console-prompt-label {
   font-weight: bold;
 }
 
-.output-value {
+.output-doc {
   color: #1AD027;
   font-size: 1em;
 }
