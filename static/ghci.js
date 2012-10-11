@@ -51,6 +51,8 @@ $(function() {
         out = document.createElement("div");
         var nodes = context.getNodes();
         for (var i = 0; i < nodes.length; i++) {
+          var n = $(nodes[i]);
+          n.html(n.html().replace(/\n/g, '<br/>'));
           out.appendChild(nodes[i]);
         }
       }
