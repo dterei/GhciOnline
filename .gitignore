@@ -2,3 +2,4 @@ dist/
 cabal-dev/
 log/
 resources/
+.DS_Store
