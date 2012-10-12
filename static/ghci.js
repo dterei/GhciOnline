@@ -94,12 +94,6 @@ $(function() {
     $.post('/ghci');
   }, 10 * 1000);
 
-  // Blink the cursor...
-  setInterval(function(){
-    $("#console").css("min-height", $(window).height() - 140);
-    $(".jquery-console-cursor").toggleClass("blink");
-  }, 750);
-
   /* ************************************ */
   /* JQuery Console... */
   /* ************************************ */
@@ -110,6 +104,7 @@ $(function() {
     autofocus: true,
     animateScroll: false,
     promptHistory: true,
+    blink: true,
 
     commandValidate:function(line) {
       if (line == "") return false;
@@ -127,6 +122,10 @@ $(function() {
       $(".jquery-console-cursor").scrollintoview();
       return true;
     }
+  });
+
+  $(".brand").click(function() {
+    $("#console").click();
   });
 
 });
