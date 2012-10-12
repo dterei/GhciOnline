@@ -1,6 +1,7 @@
 @charset "UTF-8";
 /* @import url(http://fonts.googleapis.com/css?family=Inconsolata); */
 @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono);
+@import url(http://fonts.googleapis.com/css?family=Ubuntu);
 /* @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono); */
 /* @import url(http://fonts.googleapis.com/css?family=PT+Mono); */
 
@@ -11,6 +12,7 @@ body {
 
 .brand {
   color: #DFDFDF !important;
+  font-weight: bold !important;
 }
 
 .brand img {
@@ -22,6 +24,10 @@ body {
 
 #safe-brand, #safe-brand a, #safe-brand a:visited {
   color: #FFF !important;
+}
+
+.navbar-inner {
+  font-family: 'Ubuntu';
 }
 
 .navbar-inverse .navbar-inner {
