@@ -6,22 +6,25 @@ module GHCiManager (
         queryGHCi
     ) where
 
+import CJail.System.Process
 import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import System.IO
-import System.Process
 
 import GHCiParser
 
-type GHCiHandle = (Handle, Handle, Handle, ProcessHandle)
+type GHCiHandle = ProcessHandle
+
+cjailConf :: CJailConf
+cjailConf = CJailConf Nothing Nothing "/home/hs15/cjail/ghci-online-jail/"
 
 ghciPath :: FilePath
-ghciPath = "ghci"
+ghciPath = "/home/ghc/bin/ghci-safe"
 
 ghciArgs :: [String]
-ghciArgs = []
+ghciArgs = ["-XSafe", "-fpackage-trust", "-distrust-all-packages", "-trust base"]
 
 stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
@@ -29,10 +32,8 @@ stderrSentinel = "oopsthisisnotavariable"
 
 newGHCi :: IO GHCiHandle
 newGHCi = do
-    (Just hin, Just hout, Just herr, pid) <-
-      createProcess (proc ghciPath ghciArgs) {
-              std_out = CreatePipe, std_in = CreatePipe, std_err = CreatePipe
-          }
+    phandle@(ProcessHandle hin hout herr _) <-
+      createProcess cjailConf (proc ghciPath ghciArgs)
     -- TODO: check this actually worked...
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering
@@ -42,13 +43,13 @@ newGHCi = do
     T.hPutStrLn hin $ stderrSentinel
     _ <- getGHCiOut herr stderrSentinel
     clearHandle hout
-    return (hin, hout, herr, pid)
+    return phandle
 
 killGHCi :: GHCiHandle -> IO ()
-killGHCi (_, _, _, pid) = terminateProcess pid
+killGHCi = terminateProcess
 
 queryGHCi :: GHCiHandle -> Text -> IO Text
-queryGHCi (hin, hout, herr, _) input = do
+queryGHCi (ProcessHandle hin hout herr _) input = do
     clearHandle hout
     T.hPutStrLn hin $ ensureNoNewLine input
     -- This is a hack that lets us discover where the end of the output is.
