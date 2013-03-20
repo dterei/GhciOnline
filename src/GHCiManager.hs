@@ -19,10 +19,10 @@ import GHCiParser
 type GHCiHandle = ProcessHandle
 
 cjailConf :: CJailConf
-cjailConf = CJailConf Nothing Nothing "/home/hs15/cjail/ghci-online-jail/"
+cjailConf = CJailConf Nothing Nothing "/opt/ghc-online/jail/"
 
 ghciPath :: FilePath
-ghciPath = "/home/ghc/bin/ghci-safe"
+ghciPath = "/usr/bin/ghci-safe"
 
 ghciArgs :: [String]
 ghciArgs = ["-XSafe", "-fpackage-trust", "-distrust-all-packages", "-trust base"]
