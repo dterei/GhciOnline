@@ -201,6 +201,38 @@
         };
 
         ////////////////////////////////////////////////////////////////////////
+        // The prompt to use
+        extern.promptText = function(text){
+            if (text) {
+                promptText = text;
+                column = promptText.length;
+                updatePromptDisplay();
+            }
+            return promptText;
+        };
+
+        ////////////////////////////////////////////////////////////////////////
+        // Disable input
+        function disableInput() {
+            acceptInput = false;
+        };
+        extern.disableInput = disableInput;
+
+        // Enable input
+        function enableInput() {
+            acceptInput = true;
+        }
+        extern.enableInput = enableInput;
+
+        extern.disableBlink = function() {
+            config.blink = false;
+        }
+
+        extern.enableBlink = function() {
+            config.blink = true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
         // Make a new prompt box
         function newPromptBox() {
             column = 0;
@@ -225,8 +257,10 @@
         // Blink the cursor...
         if (config.blink) {
           setInterval(function(){
-              container.css("min-height", $(window).height() - 140);
-              $(".jquery-console-cursor").toggleClass("blink");
+              if (config.blink) {
+                container.css("min-height", $(window).height() - 140);
+                $(".jquery-console-cursor").toggleClass("blink");
+              }
           }, 750);
         }
 
@@ -476,17 +510,6 @@
         };
 
         ////////////////////////////////////////////////////////////////////////
-        // Disable input
-        function disableInput() {
-            acceptInput = false;
-        };
-
-        // Enable input
-        function enableInput() {
-            acceptInput = true;
-        }
-
-        ////////////////////////////////////////////////////////////////////////
         // Reset the prompt in invalid command
         function commandResult(msg,className) {
             column = -1;
@@ -600,15 +623,6 @@
         };
 
         function doNothing() {};
-
-        extern.promptText = function(text){
-            if (text) {
-                promptText = text;
-                column = promptText.length;
-                updatePromptDisplay();
-            }
-            return promptText;
-        };
 
         ////////////////////////////////////////////////////////////////////////
         // Update the prompt display

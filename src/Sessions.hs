@@ -54,12 +54,12 @@ getSession = do
         Nothing  -> pass
         Just uid -> return uid
 
-requireSession :: Session a -> Snap a
+requireSession :: Session a -> Snap (UID, a)
 requireSession mst = do
     uid <- getSession <|> noSessionError
     c'  <- liftIO $ withMVar mst (return . I.lookup uid)
     case c' of
-        Just c  -> return c
+        Just c  -> return (uid, c)
         Nothing -> do
             -- invalid session cookie so expire it
             expireSession

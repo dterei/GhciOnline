@@ -73,10 +73,10 @@ startSession gst uid = liftIO $ modifyMVar_ (gsClients gst) $ \st ->
             return $ I.insert uid (ClientState h t) st
 
 endSession :: GhciState -> UID -> IO ()
-endSession gst uid = modifyMVar_ (gsClients gst) $ \st ->
+endSession gst uid = modifyMVar_ (gsClients gst) $ \st -> do
     -- lookup + delete in one operation
     let (mclient, st') = I.updateLookupWithKey (\_ _ -> Nothing) uid st
-    in case mclient of
+    case mclient of
         Nothing -> return st'
         Just client -> do
             killGHCi $ csGhci client
@@ -85,11 +85,14 @@ endSession gst uid = modifyMVar_ (gsClients gst) $ \st ->
 
 ghciIn :: GhciState -> Snap ()
 ghciIn gst = do
-    cst <- requireSession (gsClients gst)
+    (uid, cst) <- requireSession (gsClients gst)
     liftIO $ T.tickle (csTout cst)
     uin <- getData
     liftIO $ T.pause (csTout cst)
-    out <- liftIO $ queryGHCi (csGhci cst) (decodeUtf8 uin)
+    out' <- liftIO $ queryGHCi (csGhci cst) (decodeUtf8 uin)
+    out <- case out' of
+        Left  out -> liftIO (endSession gst uid) >> return out
+        Right out -> return out
     liftIO $ T.resume (csTout cst)
     writeBS $ encodeUtf8 out
     modifyResponse $ setContentType "text/plain; charset=UTF-8"

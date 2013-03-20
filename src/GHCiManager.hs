@@ -7,6 +7,7 @@ module GHCiManager (
     ) where
 
 import CJail.System.Process
+import Control.Exception
 import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -48,25 +49,36 @@ newGHCi = do
 killGHCi :: GHCiHandle -> IO ()
 killGHCi = terminateProcess
 
-queryGHCi :: GHCiHandle -> Text -> IO Text
+queryGHCi :: GHCiHandle -> Text -> IO (Either Text Text)
 queryGHCi (ProcessHandle hin hout herr _) input = do
-    clearHandle hout
-    T.hPutStrLn hin $ ensureNoNewLine input
-    -- This is a hack that lets us discover where the end of the output is.
-    -- We will keep reading until we see the sentinel.
-    (prompt, output) <- do
-        T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
-        o <- getGHCiOut hout stdoutSentinel
-        p <- hGetAvailable hout
-        return $ (T.strip p, T.strip o)
-    errors <- do
-        T.hPutStrLn hin $ stderrSentinel
-        o <- getGHCiOut herr stderrSentinel
-        return $ T.strip o
-    if T.null errors
-        then return $ prepJSON "value" prompt (jsonText output)
-        else return $ prepJSON "error" "" (parseErrors errors)
+    failGHCi `tryJust` toGHCi
   where
+    toGHCi :: IO Text
+    toGHCi = do
+        clearHandle hout
+        T.hPutStrLn hin $ ensureNoNewLine input
+        -- This is a hack that lets us discover where the end of the output is.
+        -- We will keep reading until we see the sentinel.
+        (prompt, output) <- do
+            T.hPutStrLn hin $ ":t " `T.append` stdoutSentinel
+            o <- getGHCiOut hout stdoutSentinel
+            p <- hGetAvailable hout
+            return $ (T.strip p, T.strip o)
+        errors <- do
+            T.hPutStrLn hin $ stderrSentinel
+            o <- getGHCiOut herr stderrSentinel
+            return $ T.strip o
+        return $ if T.null errors
+            then prepJSON "value" prompt (jsonText output)
+            else prepJSON "error" "" (parseErrors errors)
+
+    failGHCi :: SomeException -> Maybe Text
+    failGHCi _ = Just $ prepJSON "fatal" "" $ parseErrors $
+        "::An irrecoverable error occured with GHCi!\n" `T.append`
+        "We currently only allow a session to use up to 100MB " `T.append`
+        "of memory.\nPlease reload the website to restart..."
+
+    prepJSON :: Text -> Text -> Text -> Text
     prepJSON t p l = "{" `T.append`
             "\"prompt\":\"" `T.append` p `T.append`
             "\", \"type\":\"" `T.append` t `T.append`

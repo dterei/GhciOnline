@@ -1,16 +1,20 @@
 $(function() {
+  
+  var running = true;
 
   /* ************************************ */
   /* Server... */
   /* ************************************ */
 
   function sendToServer(content, callback) {
-    $.ajax({
-      type: 'POST',
-      url: "/ghci",
-      data: {'data' : content},
-      success: callback
-    });
+    if (running) {
+      $.ajax({
+        type: 'POST',
+        url: "/ghci",
+        data: {'data' : content},
+        success: callback
+      });
+    }
   }
 
   function startsWith(bigger, smaller) {
@@ -61,6 +65,17 @@ $(function() {
         msg: htmlDecode(content['msg'][2]),
         className: "output-error"
       }];
+    } else if (content['type'] == "fatal") {
+      out = [{
+        msg: htmlDecode(content['msg'][2]),
+        className: "output-error"
+      }];
+      running = false;
+      cn.disableInput();
+      cn.disableBlink();
+      cn.promptLabel = '';
+      $('pre').css('background-color', '#555');
+      $('body').css('background-color', '#555');
     } else if (content['type'] == "doc") {
       out = [{
         msg: htmlDecode(content['msg']),
@@ -91,7 +106,9 @@ $(function() {
 
   // Keep-Alive (once every 10 seconds)
   setInterval(function () {
-    $.post('/ghci');
+    if (running) {
+      $.post('/ghci');
+    }
   }, 10 * 1000);
 
   /* ************************************ */
