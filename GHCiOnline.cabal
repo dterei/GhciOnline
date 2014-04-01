@@ -36,6 +36,7 @@ Executable GHCiOnline
     Other-Modules:  GHCiManager,
                     GHCiParser,
                     Sessions,
+                    State,
                     Timeout,
                     CJail.System.Process
     Ghc-Options: -Wall

@@ -1,0 +1,13 @@
+[Unit]
+Description=GHCiOnline Web App
+After=network.target cjail.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/conf.d/ghci-online
+ExecStart=/opt/ghc-online/ghci-online
+Restart=on-abort
+#User=ghcio
+
+[Install]
+WantedBy=multi-user.target

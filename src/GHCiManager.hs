@@ -15,26 +15,17 @@ import qualified Data.Text.IO as T
 import System.IO
 
 import GHCiParser
-
-type GHCiHandle = ProcessHandle
-
-cjailConf :: CJailConf
-cjailConf = CJailConf Nothing Nothing "/opt/ghc-online/jail/"
-
-ghciPath :: FilePath
-ghciPath = "/usr/bin/ghci-safe"
-
-ghciArgs :: [String]
-ghciArgs = ["-XSafe", "-fpackage-trust", "-distrust-all-packages", "-trust base"]
+import State
 
 stdoutSentinel, stderrSentinel :: Text
 stdoutSentinel = "01234568909876543210"
 stderrSentinel = "oopsthisisnotavariable"
 
-newGHCi :: IO GHCiHandle
-newGHCi = do
+newGHCi :: GhciState -> IO GHCiHandle
+newGHCi gst = do
     phandle@(ProcessHandle hin hout herr _) <-
-      createProcess cjailConf (proc ghciPath ghciArgs)
+      createProcess (gsCJail gst) $
+        proc (gsGhciPath gst) (gsGhciArgs gst)
     -- TODO: check this actually worked...
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering

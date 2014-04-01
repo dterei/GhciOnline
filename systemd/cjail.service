@@ -1,0 +1,9 @@
+[Unit]
+Description=Setup CJail on the machine.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cjail --init
+
+[Install]
+WantedBy=multi-user.target

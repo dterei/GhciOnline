@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards #-}
+-- | GHCi Online entry point.
 module Main (
         main
     ) where
@@ -11,6 +12,7 @@ import qualified Data.IntMap as I
 import Data.Monoid
 import qualified Data.HashMap.Strict as H
 import Data.Text.Encoding
+import System.IO
 
 import Snap.Core
 import Snap.Http.Server
@@ -18,42 +20,39 @@ import Snap.Util.FileServe
 
 import GHCiManager
 import Sessions
+import State
 import qualified Timeout as T
 
-data GhciState = GhciState {
-        gsClients :: Session ClientState,
-        gsTimeout :: T.Manager
-    }
-
-data ClientState = ClientState {
-        csGhci :: GHCiHandle,
-        csTout :: T.Handle
-    }
-
+-- | Snap server configuration.
 config :: Config Snap ()
 config = setPort 3222 mempty
 
+-- | Main entry point.
 main :: IO ()
 main = do
-    st <- newMVar I.empty
-    -- 15 seconds...
-    tm <- T.initialize (15 * 1000000)
-    httpServe config (site $ GhciState st tm)
+    putStrLn "Helo World!"
+    st <- initState
+    hFlush stdout
+    httpServe config $ site st
 
+-- | Routes for ghci online.
 site :: GhciState -> Snap ()
 site gst = do
     req <- getRequest
     routes req
   where
+    indexFile = (gsHtmlRoot gst) ++ "/index.html"
     routes req =
         if (rqServerName req == "www.ghc.io") then (redirect' "http://ghc.io" 301) else pass <|>
-        ifTop (index gst "static/index.html") <|>
+        ifTop (index gst indexFile) <|>
         path "ghci" (method POST (ghciIn gst)) <|>
-        dir "static" (serveDirectoryWith conf "static")
+        dir "static" (serveDirectoryWith conf $ gsHtmlRoot gst)
+
     -- somewhat of a hack to get UTF-8 info passed in headers...
     utf8mime = H.map (\v -> v `S8.append` "; charset=UTF-8") defaultMimeTypes
     conf = simpleDirectoryConfig { mimeTypes = utf8mime }
 
+-- | Server index page.
 index :: GhciState -> String -> Snap ()
 index gst file = do
     uid <- getSession <|> newSession (gsClients gst)
@@ -62,16 +61,18 @@ index gst file = do
     modifyResponse $ setHeader "Content-Language" "en"
     sendFile file
 
+-- | Start a new GHCi session for a user.
 startSession :: GhciState -> UID -> Snap ()
 startSession gst uid = liftIO $ modifyMVar_ (gsClients gst) $ \st ->
     case I.lookup uid st of
         Just _  -> return st
         Nothing -> do
-            h <- liftIO newGHCi
+            h <- liftIO $ newGHCi gst
             t <- T.register (gsTimeout gst) $ endSession gst uid
             -- let t = undefined
             return $ I.insert uid (ClientState h t) st
 
+-- | End a GHCi session for a user.
 endSession :: GhciState -> UID -> IO ()
 endSession gst uid = modifyMVar_ (gsClients gst) $ \st -> do
     -- lookup + delete in one operation
@@ -83,6 +84,7 @@ endSession gst uid = modifyMVar_ (gsClients gst) $ \st -> do
             T.cancel $ csTout client
             return st'
 
+-- | Process some input from the user.
 ghciIn :: GhciState -> Snap ()
 ghciIn gst = do
     (uid, cst) <- requireSession (gsClients gst)
