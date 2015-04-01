@@ -4,8 +4,8 @@ After=network.target cjail.service
 
 [Service]
 Type=simple
-EnvironmentFile=/etc/conf.d/ghci-online
-ExecStart=/opt/ghc-online/ghci-online
+EnvironmentFile=/etc/conf.d/ghcio
+ExecStart=/var/ghcio/ghcio
 Restart=on-abort
 #User=ghcio
 

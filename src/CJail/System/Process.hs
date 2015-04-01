@@ -228,15 +228,17 @@ mkCreateProcess :: CJailConf -> CreateProcess -> P.CreateProcess
 mkCreateProcess conf cp =
   let (cjail, cjailArgs) = confToCmdArgs conf
   in P.CreateProcess 
-        { P.cmdspec      = RawCommand cjail $
-                              cjailArgs ++ cmdSpecToArgs (cmdspec cp)
-        , P.cwd          = cwd cp
-        , P.env          = Just $ env cp
-        , P.std_in       = P.CreatePipe
-        , P.std_out      = P.CreatePipe
-        , P.std_err      = P.CreatePipe
-        , P.close_fds    = True
-        , P.create_group = False }
+        { P.cmdspec       = RawCommand cjail $
+                               cjailArgs ++ cmdSpecToArgs (cmdspec cp)
+        , P.cwd           = cwd cp
+        , P.env           = Just $ env cp
+        , P.std_in        = P.CreatePipe
+        , P.std_out       = P.CreatePipe
+        , P.std_err       = P.CreatePipe
+        , P.close_fds     = True
+        , P.create_group  = False
+        , P.delegate_ctlc = False
+        }
 
 -- | Conver 'CmdSpec' to list of arguments to @cjail@
 cmdSpecToArgs :: CmdSpec -> [String]

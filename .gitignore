@@ -1,5 +1,6 @@
 dist/
-cabal-dev/
 log/
 resources/
 .DS_Store
+.cabal-sandbox/
+cabal.sandbox.config

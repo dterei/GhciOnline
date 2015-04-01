@@ -30,7 +30,6 @@ config = setPort 3222 mempty
 -- | Main entry point.
 main :: IO ()
 main = do
-    putStrLn "Helo World!"
     st <- initState
     hFlush stdout
     httpServe config $ site st
@@ -69,7 +68,6 @@ startSession gst uid = liftIO $ modifyMVar_ (gsClients gst) $ \st ->
         Nothing -> do
             h <- liftIO $ newGHCi gst
             t <- T.register (gsTimeout gst) $ endSession gst uid
-            -- let t = undefined
             return $ I.insert uid (ClientState h t) st
 
 -- | End a GHCi session for a user.

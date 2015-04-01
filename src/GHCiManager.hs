@@ -13,6 +13,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import System.IO
+import System.IO.Error
 
 import GHCiParser
 import State
@@ -22,11 +23,10 @@ stdoutSentinel = "01234568909876543210"
 stderrSentinel = "oopsthisisnotavariable"
 
 newGHCi :: GhciState -> IO GHCiHandle
-newGHCi gst = do
+newGHCi gst = flip catchIOError ioHandle $ do
     phandle@(ProcessHandle hin hout herr _) <-
       createProcess (gsCJail gst) $
         proc (gsGhciPath gst) (gsGhciArgs gst)
-    -- TODO: check this actually worked...
     hSetBuffering hin NoBuffering
     hSetBuffering hout NoBuffering
     hSetBuffering herr NoBuffering
@@ -36,6 +36,12 @@ newGHCi gst = do
     _ <- getGHCiOut herr stderrSentinel
     clearHandle hout
     return phandle
+
+  where
+    ioHandle err = do
+      when (isEOFError err) $ do
+        putStrLn "Couldn't launch GHCi!"
+      ioError err
 
 killGHCi :: GHCiHandle -> IO ()
 killGHCi = terminateProcess

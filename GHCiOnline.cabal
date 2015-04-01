@@ -45,7 +45,7 @@ Executable GHCiOnline
                    bytestring >= 0.9,
                    case-insensitive,
                    containers >= 0.4,
-                   process >= 1,
+                   process >= 1.2,
                    random >= 1,
                    snap-core >= 0.9,
                    snap-server >= 0.9,
